@@ -189,23 +189,24 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    SmartDashboard.putNumber("xSpeed", xSpeed);
-    SmartDashboard.putNumber("ySpeed", ySpeed);
-    SmartDashboard.putNumber("rot", rot);
     //Square inputs
-    xSpeed=Math.signum(xSpeed)* xSpeed*xSpeed;
-    ySpeed=Math.signum(ySpeed)* ySpeed*ySpeed;
-    rot=Math.signum(rot)* rot*rot;
+    // xSpeed=Math.signum(xSpeed)* xSpeed*xSpeed;
+    // ySpeed=Math.signum(ySpeed)* ySpeed*ySpeed;
+    // rot=Math.signum(rot)* rot*rot;
 
     // Apply joystick deadband
-    xSpeed = MathUtil.applyDeadband(xSpeed, OIConstants.kDeadband, 1.0);
-    ySpeed = MathUtil.applyDeadband(ySpeed, OIConstants.kDeadband, 1.0);
-    rot = MathUtil.applyDeadband(rot, OIConstants.kDeadband, 1.0);
+    // xSpeed = MathUtil.applyDeadband(xSpeed, OIConstants.kDeadband, 1.0);
+    // ySpeed = MathUtil.applyDeadband(ySpeed, OIConstants.kDeadband, 1.0);
+    // rot = MathUtil.applyDeadband(rot, OIConstants.kDeadband, 1.0);
 
     // Apply speed scaling
     xSpeed = xSpeed * m_DriverSpeedScale;
     ySpeed = ySpeed * m_DriverSpeedScale;
     rot = rot * m_DriverSpeedScale;
+
+    SmartDashboard.putNumber("xSpeed", xSpeed);
+    SmartDashboard.putNumber("ySpeed", ySpeed);
+    SmartDashboard.putNumber("rot", rot);
 
     var swerveModuleStates =
         SwerveConstants.kDriveKinematics.toSwerveModuleStates(

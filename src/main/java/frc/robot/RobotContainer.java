@@ -35,19 +35,19 @@ public class RobotContainer {
       .alongWith(m_indexer.in());
   private final Command shoot = 
     m_shooterIntake.shoot()
-      // .alongWith(m_shooterIntake.waitForSpeed()
-        .alongWith(m_indexer.out());
+       .alongWith(m_shooterIntake.waitForSpeed())
+        .andThen(m_indexer.out());
   private final Command outtake = 
     m_shooterIntake.outtake()
       .alongWith(m_indexer.out());
   private final Command stopAll =
     m_indexer.stop()
       .alongWith(m_shooterIntake.stop());
-  private final Command intakeShoot = 
-    m_shooterIntake.shoot()
-      // .alongWith(m_indexer.in()
-        // .andThen(m_shooterIntake.waitForSpeed()
-           .alongWith(m_indexer.out());
+  // private final Command intakeShoot = 
+  //   m_shooterIntake.shoot()
+  //      .alongWith(m_indexer.in())
+  //       .alongWith(m_shooterIntake.waitForSpeed()
+  //          .andThen(m_indexer.out()));
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -71,9 +71,12 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_robotDrive.drive(
-                    m_xspeedLimiter.calculate( -m_driverController.getLeftY() )*SwerveConstants.kMaxSpeedTeleop,
-                    m_yspeedLimiter.calculate( -m_driverController.getLeftX() )*SwerveConstants.kMaxSpeedTeleop,
-                    m_rotLimiter.calculate( -m_driverController.getRightX() )*ConstantsOffboard.MAX_ANGULAR_RADIANS_PER_SECOND,
+                   // -m_driverController.getLeftY() *SwerveConstants.kMaxSpeedTeleop,
+                   //-m_driverController.getLeftX() *SwerveConstants.kMaxSpeedTeleop,
+                   // -m_driverController.getRightX() *ConstantsOffboard.MAX_ANGULAR_RADIANS_PER_SECOND,
+                     m_xspeedLimiter.calculate( -m_driverController.getLeftY() )*SwerveConstants.kMaxSpeedTeleop,
+                     m_yspeedLimiter.calculate( -m_driverController.getLeftX() )*SwerveConstants.kMaxSpeedTeleop,
+                     m_rotLimiter.calculate( -m_driverController.getRightX() )*ConstantsOffboard.MAX_ANGULAR_RADIANS_PER_SECOND,
                     true),
             m_robotDrive));
     }
@@ -89,7 +92,7 @@ public class RobotContainer {
     m_driver.leftBumper().whileTrue(intake);
     m_driver.rightBumper().whileTrue(shoot);
     m_driver.a().whileTrue(outtake);
-    m_driver.y().whileTrue(stopAll);
-    m_driver.rightTrigger().whileTrue(intakeShoot);
+    // m_driver.y().whileTrue(stopAll);
+   // m_driver.rightTrigger().whileTrue(intakeShoot);
   }
 }

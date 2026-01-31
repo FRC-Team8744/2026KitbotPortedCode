@@ -16,7 +16,7 @@ public final class Constants {
   public static final int kMaxSpeedPercentAuto = 100;
   public static final int kMaxSpeedPercentTeleop = 100;
   public static final int kMaxAccelerationPercent = 100;
-  public static final double kDriverSpeedLimit = 0.1; // sets how much the max speed is modified by when you press down on the left stick basicly make go slower the default is 1 btw 
+  public static final double kDriverSpeedLimit = 0.5; // sets how much the max speed is modified by when you press down on the left stick basicly make go slower the default is 1 btw 
 
 
 
@@ -95,7 +95,7 @@ public final class Constants {
     public static final int DRIVE_CURRENT_LIMIT = 40;
     public static final int ANGLE_CURRENT_LIMIT = 20;
 
-    public static final boolean DRIVE_MOTOR_PROFILED_MODE = true;
+    public static final boolean DRIVE_MOTOR_PROFILED_MODE = false;
     /** Angle motor PID values for speed/acceleration limited mode. */
     // Reference: https://github.com/REVrobotics/SPARK-MAX-Examples/blob/master/Java/Smart%20Motion%20Example/src/main/java/frc/robot/Robot.java
     public static final double DRIVE_KP_PROFILED = 0.01;
@@ -112,7 +112,7 @@ public final class Constants {
     public static final double DRIVE_KD = 0.0;
     public static final double DRIVE_KF = 0.25;
 
-    public static final boolean ANGLE_MOTOR_PROFILED_MODE = true;
+    public static final boolean ANGLE_MOTOR_PROFILED_MODE = false;
     /** Angle motor PID values for speed/acceleration limited mode. */
     // Reference: https://github.com/REVrobotics/SPARK-MAX-Examples/blob/master/Java/Smart%20Motion%20Example/src/main/java/frc/robot/Robot.java
     public static final double ANGLE_KP_PROFILED = 0.00075; //0.00001;
