@@ -29,14 +29,14 @@ public class RobotContainer {
   private final ShooterIntake m_shooterIntake = new ShooterIntake();
   private final Indexer m_indexer = new Indexer();
 
-  //TODO: Once waitForSpeed if fix, fix these
+  //TODO: Once waitForSpeed is fix, fix these
   private final Command intake = 
     m_shooterIntake.intake()
       .alongWith(m_indexer.in());
   private final Command shoot = 
     m_shooterIntake.shoot()
-       .alongWith(m_shooterIntake.waitForSpeed())
-        .andThen(m_indexer.out());
+       .alongWith(m_shooterIntake.waitForSpeed()
+        .andThen(m_indexer.out()));
   private final Command outtake = 
     m_shooterIntake.outtake()
       .alongWith(m_indexer.out());
