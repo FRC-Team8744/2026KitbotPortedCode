@@ -39,7 +39,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final SwerveModuleOffboard m_rearRight;
 
   // The imu sensor
-  private final Multi_IMU m_imu = new Multi_IMU();
+  public final Multi_IMU m_imu = new Multi_IMU();
   
   // Odometry class for tracking robot pose
   private SwerveDriveOdometry m_odometry;

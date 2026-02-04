@@ -58,8 +58,8 @@ public class ShooterIntake extends SubsystemBase {
 
     //TODO: never seems to continue
     public Command waitForSpeed() {
-      //  return Commands.waitUntil(this::atSpeed);
-       return Commands.waitTime(new ImmutableTime(1, 1, Seconds));
+       return Commands.waitUntil(this::atSpeed);
+      // return Commands.waitTime(new ImmutableTime(1, 1, Seconds));
     }
 
     public Command intake() {

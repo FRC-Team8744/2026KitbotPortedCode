@@ -13,6 +13,7 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.ShooterIntake;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -35,8 +36,8 @@ public class RobotContainer {
       .alongWith(m_indexer.in());
   private final Command shoot = 
     m_shooterIntake.shoot()
-       .alongWith(m_shooterIntake.waitForSpeed())
-        .andThen(m_indexer.out());
+       //.alongWith(m_shooterIntake.waitForSpeed())
+        .alongWith(m_indexer.out());
   private final Command outtake = 
     m_shooterIntake.outtake()
       .alongWith(m_indexer.out());
@@ -92,6 +93,7 @@ public class RobotContainer {
     m_driver.leftBumper().whileTrue(intake);
     m_driver.rightBumper().whileTrue(shoot);
     m_driver.a().whileTrue(outtake);
+    m_driver.back().whileTrue(Commands.runOnce(() -> m_robotDrive.m_imu.zeroHeading()));
     // m_driver.y().whileTrue(stopAll);
    // m_driver.rightTrigger().whileTrue(intakeShoot);
   }
