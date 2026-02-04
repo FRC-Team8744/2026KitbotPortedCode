@@ -29,7 +29,6 @@ public class ShooterIntake extends SubsystemBase {
     private double speed;
 
     //TODO: add motor configurations
-    //TODO: add second intake motor
     public ShooterIntake() {
         super("ShooterIntake");
         Shooter = new SparkMax(shooterID, MotorType.kBrushless);
@@ -37,6 +36,7 @@ public class ShooterIntake extends SubsystemBase {
         setDefaultCommand(standby());
     }
     
+    //TODO: need to have intake on it's own run method
     public void run(final double speed) {
         final double validSpeed = MathUtil.clamp(speed, -1, 1);
         this.speed = validSpeed;
@@ -56,7 +56,7 @@ public class ShooterIntake extends SubsystemBase {
         return Commands.run(() -> run(shootSpeed), this);
     }
 
-    //TODO: never seems to continue
+    //TODO: never seems to continue look atr Commands.waitSeconds
     public Command waitForSpeed() {
        return Commands.waitUntil(this::atSpeed);
       // return Commands.waitTime(new ImmutableTime(1, 1, Seconds));
