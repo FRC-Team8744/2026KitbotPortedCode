@@ -1,12 +1,5 @@
 {
-  "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 0.7389090301854088,
-      "y": 6.626122327080732
-    },
-    "rotation": 59.3813945910906
-  },
+  "version": "2025.0",
   "command": {
     "type": "sequential",
     "data": {
@@ -26,6 +19,7 @@
       ]
     }
   },
+  "resetOdom": true,
   "folder": "gaming folder ",
   "choreoAuto": false
 }

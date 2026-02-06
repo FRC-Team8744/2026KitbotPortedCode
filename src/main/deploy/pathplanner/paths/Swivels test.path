@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9530801650994687,
-        "y": 0.7976159507775192
+        "x": 2.0584303797892747,
+        "y": 0.8009611650303212
       },
       "isLocked": false,
       "linkedName": null
@@ -20,7 +20,7 @@
         "y": 1.7475961964446294
       },
       "prevControl": {
-        "x": 1.8104226995573856,
+        "x": 1.6760417769493865,
         "y": 1.7475961964446294
       },
       "nextControl": null,
@@ -30,20 +30,25 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
+  "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 88.45184230102204,
-    "rotateFast": false
+    "rotation": 88.45184230102204
   },
   "reversed": false,
   "folder": "Bens",
-  "previewStartingState": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
   "useDefaultConstraints": false
 }

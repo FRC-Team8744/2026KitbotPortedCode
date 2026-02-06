@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 4.5169173880387135,
-        "y": 1.1117751682014996
+        "y": 1.1117751682014998
       },
       "isLocked": false,
       "linkedName": "4pssac1"
@@ -20,8 +20,8 @@
         "y": 0.9251560871167382
       },
       "prevControl": {
-        "x": 8.530492697170857,
-        "y": 0.9518877998759822
+        "x": 8.700965583241068,
+        "y": 1.044058733191914
       },
       "nextControl": {
         "x": 7.974605201946111,
@@ -47,15 +47,16 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.75,
-      "rotationDegrees": 0,
-      "rotateFast": false
+      "rotationDegrees": 0.0
     }
   ],
   "constraintZones": [],
+  "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "Intake",
       "waypointRelativePos": 0.65,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
         "data": {
@@ -75,18 +76,19 @@
     "maxVelocity": 8.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -39.0,
-    "rotateFast": false
+    "rotation": -39.0
   },
   "reversed": false,
   "folder": "4 piece source side all center",
-  "previewStartingState": {
-    "rotation": -39.0,
-    "velocity": 0
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }
