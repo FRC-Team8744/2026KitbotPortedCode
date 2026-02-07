@@ -112,7 +112,7 @@ public class SwerveModuleOffboard {
     return new SwerveModuleState(velocity, rot);
   }
 
-  /**
+  /*
    * Returns the CANcoder's measured turn angle in degrees.
    */
   public double getCanCoder() {
