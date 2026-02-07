@@ -85,7 +85,7 @@ public class SwerveModuleOffboard {
       }
     } else {
       // Optimize the reference state to avoid spinning further than 90 degrees
-      desiredState.optimize(new Rotation2d(m_turningEncoder.getPosition()));
+      desiredState.optimize(new Rotation2d(getAbsTurnAngle()));
     }
 
     state = desiredState;
@@ -93,7 +93,7 @@ public class SwerveModuleOffboard {
     // Scale speed by cosine of angle error. This scales down movement perpendicular to the desired
     // direction of travel that can occur when modules change directions. This results in smoother
     // driving.
-    state.speedMetersPerSecond *= state.angle.minus(new Rotation2d(m_turningEncoder.getPosition())).getCos();
+    state.speedMetersPerSecond *= state.angle.minus(new Rotation2d(getAbsTurnAngle())).getCos();
 
     // Set the PID reference states
     m_drivePID.setSetpoint(state.speedMetersPerSecond, (ConstantsOffboard.DRIVE_MOTOR_PROFILED_MODE) ? SparkMax.ControlType.kMAXMotionVelocityControl : SparkMax.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
@@ -108,7 +108,7 @@ public class SwerveModuleOffboard {
 
   public SwerveModuleState getState() {
     double velocity = m_driveEncoder.getVelocity();
-    Rotation2d rot = new Rotation2d(m_turningEncoder.getPosition());
+    Rotation2d rot = new Rotation2d(getAbsTurnAngle());
     return new SwerveModuleState(velocity, rot);
   }
 
@@ -127,12 +127,27 @@ public class SwerveModuleOffboard {
         return 0.0;
     }
   }
+  /**
+   * Returns the CANcoder's measured turn angle in degrees.
+   */
+  public double getAbsTurnAngle() {
+    var posVal = m_canCoder.getAbsolutePosition(); // This actaully waits that long! Don't call after init!
+    if(posVal.getStatus().isOK()) {
+        /* Perform seeding */
+        double val = posVal.getValue().in(Degrees);
+        return (Units.degreesToRadians(val - m_canCoderOffsetDegrees));
+    } else {
+        /* Report error and retry later */
+        System.out.println("Error reading CANcoder position! Robot will not drive straight!");
+        return 0;
+    }
 
+  }
   /**
    * Returns the SparkMax internal encoder's measured turn angle in degrees.
    */
   public Rotation2d getAngle() {
-    return new Rotation2d(m_turningEncoder.getPosition());
+    return new Rotation2d(getAbsTurnAngle());
   }
 
   /**
@@ -140,7 +155,7 @@ public class SwerveModuleOffboard {
    */
   public SwerveModulePosition getPosition() {
     double distance = m_driveEncoder.getPosition();
-    Rotation2d rot = new Rotation2d(m_turningEncoder.getPosition());
+    Rotation2d rot = new Rotation2d(getAbsTurnAngle());
     return new SwerveModulePosition(distance, rot);
   }
 
