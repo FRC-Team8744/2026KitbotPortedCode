@@ -143,20 +143,6 @@ public class SwerveModuleOffboard {
     }
 
   }
-  /**
-   * Returns the CANcoder's measured turn angle in radians.
-   */
-  public double getAbsTurnAngle() {
-    var posVal = m_canCoder.getAbsolutePosition();
-    if(posVal.getStatus().isOK()) {
-        double val = posVal.getValue().in(Degrees);
-        return Units.degreesToRadians(val - m_canCoderOffsetDegrees);
-    } else {
-        /* Report error and retry later */
-        System.out.println("Error reading CANcoder position! Robot will not drive straight!");
-        return 0.0;
-    }
-  }
 
   /**
    * Returns the SparkMax internal encoder's measured turn angle in degrees.
