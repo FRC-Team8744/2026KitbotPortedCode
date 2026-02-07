@@ -4,6 +4,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,6 +24,10 @@ public class Indexer extends SubsystemBase {
         motor = new SparkMax(motorID, MotorType.kBrushless);
 
         setDefaultCommand(idle());
+    }
+    public void periodic(){
+        //SmartDashboard.putBoolean("", atSpeed()); 
+        SmartDashboard.putNumber("Indexervel", motor.getEncoder().getVelocity());
     }
 
     public void run(final double speed) {

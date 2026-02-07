@@ -10,6 +10,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.ImmutableTime;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,7 +36,12 @@ public class ShooterIntake extends SubsystemBase {
         Intake = new SparkMax(intakeID, MotorType.kBrushless);
         setDefaultCommand(standby());
     }
-    
+    @Override
+    public void periodic(){
+        SmartDashboard.putBoolean("atSpeed", atSpeed());
+        SmartDashboard.putNumber("Shootervel", Shooter.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Intakevel",Intake.getEncoder().getVelocity());
+    }
     //TODO: need to have intake on it's own run method
     public void run(final double speed) {
         final double validSpeed = MathUtil.clamp(speed, -1, 1);
@@ -56,10 +62,10 @@ public class ShooterIntake extends SubsystemBase {
         return Commands.run(() -> run(shootSpeed), this);
     }
 
-    //TODO: never seems to continue look atr Commands.waitSeconds
+    //TODO: never seems to continue look atr Commands.waitSeconds 
     public Command waitForSpeed() {
-       return Commands.waitUntil(this::atSpeed);
-      // return Commands.waitTime(new ImmutableTime(1, 1, Seconds));
+       return Commands.waitUntil(this::atSpeed);// 
+      // return Commands.waitSeconds(3.67);
     }
 
     public Command intake() {
