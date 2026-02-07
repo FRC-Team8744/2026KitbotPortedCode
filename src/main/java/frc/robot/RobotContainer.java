@@ -90,7 +90,7 @@ public class RobotContainer {
    */
   
   private void configureButtonBindings() {
-    m_driver.leftBumper().whileTrue(intake);
+    m_driver.leftBumper().whileTrue(intake).whileFalse(Commands.runOnce(() -> m_shooterIntake.stopIntake()));
     m_driver.rightBumper().whileTrue(shoot);
     m_driver.a().whileTrue(outtake);
     m_driver.back().whileTrue(Commands.runOnce(() -> m_robotDrive.m_imu.zeroHeading()));

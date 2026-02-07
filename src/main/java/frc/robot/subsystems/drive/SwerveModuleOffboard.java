@@ -143,6 +143,7 @@ public class SwerveModuleOffboard {
     }
 
   }
+
   /**
    * Returns the SparkMax internal encoder's measured turn angle in degrees.
    */
