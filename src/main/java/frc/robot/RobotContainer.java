@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ConstantsOffboard;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SwerveConstants;
@@ -30,6 +31,7 @@ public class RobotContainer {
   private final ShooterIntake m_shooterIntake = new ShooterIntake();
   private final Indexer m_indexer = new Indexer();
 
+
   //TODO: Once waitForSpeed is fix, fix these
   private final Command intake = 
     m_shooterIntake.intake()
@@ -37,7 +39,7 @@ public class RobotContainer {
   private final Command shoot = 
     m_shooterIntake.shoot()
        .alongWith(m_shooterIntake.waitForSpeed()
-        .andThen(m_indexer.out()));
+        .andThen(m_indexer.in()));
   private final Command outtake = 
     m_shooterIntake.outtake()
       .alongWith(m_indexer.out());
@@ -62,6 +64,9 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    SmartDashboard.putData(m_shooterIntake);
+    SmartDashboard.putData(m_indexer);
+
     // Configure the button bindings
     configureButtonBindings();
 

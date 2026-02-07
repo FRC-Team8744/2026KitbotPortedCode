@@ -25,22 +25,25 @@ public class ShooterIntake extends SubsystemBase {
     private static final int shooterID = 14;
     private static final int intakeID = 19;
     private static final double idleSpeed = -0;
-    private static final double shootSpeed = -0.8; // 1
-    private static final double intakeSpeed = -0.8; // 0.8
+    private static final double shootSpeed = 3000; // 1
+    private static final double intakeSpeed = 3000; // 0.8
     private static final double outtakeSpeed = 0.2; // -0.8
-    private static final double maxSpeed = 1.0; // 5000
+    // private static final double maxSpeed = 1.0; // 5000
     private static final double tolerance = 50;
+
+    private static final double kF = 0.0002;
+    private static final double kP = 0.00005;
 
     private final SparkMax Shooter;
     private final SparkMax Intake;
-    private double speed;
+    private double goalspeed;
 
     //TODO: add motor configurations
     public ShooterIntake() {
         super("ShooterIntake");
         Shooter = new SparkMax(shooterID, MotorType.kBrushless);
         Intake = new SparkMax(intakeID, MotorType.kBrushless);
-        // configMotor();
+        configMotor();
         setDefaultCommand(standby());
     }
     
@@ -53,12 +56,12 @@ public class ShooterIntake extends SubsystemBase {
     }
 
     //TODO: need to have intake on it's own run method
-    public void run(final double speed) {
-        final double validSpeed = MathUtil.clamp(speed, -1, 1);
-        this.speed = validSpeed;
+    public void run(final double rpm) {
+        final double validSpeed = MathUtil.clamp(rpm, -5600, 5600);
+        goalspeed = validSpeed;
         Intake.set(-validSpeed);
-        Shooter.set(validSpeed);
-        // Shooter.getClosedLoopController().setSetpoint(vel_rpm, ControlType.kVelocity);
+        // Shooter.set(validSpeed);
+        Shooter.getClosedLoopController().setSetpoint(validSpeed, ControlType.kVelocity);
         // SmartDashboard.putNumber("Shooter Setpoint", vel_rpm);
 
     }
@@ -68,25 +71,45 @@ public class ShooterIntake extends SubsystemBase {
 
         shooterConfig
             // .smartCurrentLimit()
-            // .inverted(false)
+            .inverted(true)
             .idleMode(IdleMode.kCoast);
         shooterConfig.closedLoop
             // .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             // Set PID values for velocity control
-            .p(0.0)
+            .p(kP)
             .i(0.0)
             .d(0.0)
-            .feedForward.kV(0.0);
+            .feedForward.kV(kF);
         // intakeConfig.closedLoop.maxMotion
         //     .maxAcceleration(20000, ClosedLoopSlot.kSlot3)  // Note: in m/s^2
         //     .cruiseVelocity(10000, ClosedLoopSlot.kSlot3)  // Note: in m/s
         //     .allowedProfileError(1, ClosedLoopSlot.kSlot3);
 
         Shooter.configure(shooterConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+
+        SparkMaxConfig intakeConfig = new SparkMaxConfig();
+
+        intakeConfig
+            // .smartCurrentLimit()
+            .inverted(true)
+            .idleMode(IdleMode.kCoast);
+        // shooterConfig.closedLoop
+        //     // .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        //     // Set PID values for velocity control
+        //     .p(kP)
+        //     .i(0.0)
+        //     .d(0.0)
+        //     .feedForward.kV(kF);
+        // intakeConfig.closedLoop.maxMotion
+        //     .maxAcceleration(20000, ClosedLoopSlot.kSlot3)  // Note: in m/s^2
+        //     .cruiseVelocity(10000, ClosedLoopSlot.kSlot3)  // Note: in m/s
+        //     .allowedProfileError(1, ClosedLoopSlot.kSlot3);
+
+        Intake.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     public boolean atSpeed() {
-        return Math.abs(Shooter.getEncoder().getVelocity() - (speed * maxSpeed)) < tolerance;
+        return Math.abs(Shooter.getEncoder().getVelocity() - goalspeed) < tolerance;
     }
 
     public Command standby() {
@@ -111,8 +134,7 @@ public class ShooterIntake extends SubsystemBase {
         return Commands.run(() -> run(outtakeSpeed), this);
     }
 
-    //TODO: this causes the code to crash
     public Command stop() {
-        return Commands.runOnce(() -> this.getCurrentCommand().cancel(), this);
+        return Commands.runOnce(() -> this.getCurrentCommand().cancel());
     }
 }
