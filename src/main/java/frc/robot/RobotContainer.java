@@ -3,7 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.ConstantsOffboard;
@@ -30,6 +31,9 @@ public class RobotContainer {
   private final ShooterIntake m_shooterIntake = new ShooterIntake();
   private final Indexer m_indexer = new Indexer();
 
+
+
+
   //TODO: Once waitForSpeed is fix, fix these
   private final Command intake = 
     m_shooterIntake.intake()
@@ -44,6 +48,12 @@ public class RobotContainer {
   private final Command stopAll =
     m_indexer.stop()
       .alongWith(m_shooterIntake.stop());
+  private final Command inAndOutBall =
+  m_shooterIntake.intake()
+  .alongWith(m_indexer.in())
+  .alongWith(m_shooterIntake.waitForSpeed())
+  .andThen(m_indexer.out());
+  
   // private final Command intakeShoot = 
   //   m_shooterIntake.shoot()
   //      .alongWith(m_indexer.in())
@@ -62,6 +72,10 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+
+    SmartDashboard.putData(m_shooterIntake);
+    SmartDashboard.putData(m_indexer);
     // Configure the button bindings
     configureButtonBindings();
 
@@ -90,11 +104,15 @@ public class RobotContainer {
    */
   
   private void configureButtonBindings() {
+    
     m_driver.leftBumper().whileTrue(intake).whileFalse(Commands.runOnce(() -> m_shooterIntake.stopIntake()));
     m_driver.rightBumper().whileTrue(shoot);
     m_driver.a().whileTrue(outtake);
     m_driver.back().whileTrue(Commands.runOnce(() -> m_robotDrive.m_imu.zeroHeading()));
     // m_driver.y().whileTrue(stopAll);
    // m_driver.rightTrigger().whileTrue(intakeShoot);
+    m_driver.x().onTrue(Commands.runOnce (() -> m_driver.setRumble(RumbleType.kBothRumble, .09)));
+    m_driver.y().onTrue(Commands.runOnce (() -> m_driver.setRumble(RumbleType.kBothRumble, 0.0)));
+    m_driver.b().whileTrue(inAndOutBall);
   }
 }
