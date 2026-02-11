@@ -83,16 +83,15 @@ public class ShooterIntake extends SubsystemBase {
     private void configMotor(){
         SparkMaxConfig shooterConfig = new SparkMaxConfig();
         
-        shooterConfig.
-        
-        idleMode(IdleMode.kCoast)
- .inverted(false);
+        shooterConfig
+            .idleMode(IdleMode.kCoast)
+            .smartCurrentLimit(40)
+            .inverted(false);
         shooterConfig.closedLoop
-        .p(kP)
-        .i(0.0)
-        .d(0.0)
-        
-        .feedForward.kV(kF);
+            .p(kP)
+            .i(0.0)
+            .d(0.0)
+            .feedForward.kV(kF);
          
         Shooter.configure(shooterConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 

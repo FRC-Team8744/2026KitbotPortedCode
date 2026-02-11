@@ -108,10 +108,11 @@ public class RobotContainer {
     m_driver.leftBumper().whileTrue(intake).whileFalse(Commands.runOnce(() -> m_shooterIntake.stopIntake()));
     m_driver.rightBumper().whileTrue(shoot);
     m_driver.a().whileTrue(outtake);
+    
     m_driver.back().whileTrue(Commands.runOnce(() -> m_robotDrive.m_imu.zeroHeading()));
     // m_driver.y().whileTrue(stopAll);
    // m_driver.rightTrigger().whileTrue(intakeShoot);
-    m_driver.x().onTrue(Commands.runOnce (() -> m_driver.setRumble(RumbleType.kBothRumble, .09)));
+    m_driver.x().whileTrue(Commands.runOnce (() -> m_driver.setRumble(RumbleType.kBothRumble, 1.0))).whileFalse(Commands.runOnce (() -> m_driver.setRumble(RumbleType.kBothRumble,0)));
     m_driver.y().onTrue(Commands.runOnce (() -> m_driver.setRumble(RumbleType.kBothRumble, 0.0)));
     m_driver.b().whileTrue(inAndOutBall);
   }
