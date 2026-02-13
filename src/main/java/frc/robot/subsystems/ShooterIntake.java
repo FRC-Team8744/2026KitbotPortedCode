@@ -32,6 +32,8 @@ public class ShooterIntake extends SubsystemBase {
     private static final double tolerance = 50;
     private static final double kF = 0.0002;
     private static final double kP = 0.00005;
+    private double lastVelocity = 0;
+    private double ShotCount = 0;
 
 
     private final SparkMax Shooter;
@@ -48,9 +50,22 @@ public class ShooterIntake extends SubsystemBase {
     }
     @Override
     public void periodic(){
+        double nowVel = Shooter.getEncoder().getVelocity();
+        double nowSetpoint = goalspeed;
+        if ( nowSetpoint != 0) {
+            if ((lastVelocity >= 4000.0) && ((nowVel < 4000.0))) {
+                ShotCount++;
+            }
+        }
         SmartDashboard.putBoolean("atSpeed", atSpeed());
-        SmartDashboard.putNumber("Shootervel", Shooter.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Shootervel", nowVel); //Shooter.getEncoder().getVelocity());
         SmartDashboard.putNumber("Intakevel",Intake.getEncoder().getVelocity());
+        SmartDashboard.putNumber("ShooterCurrent", Shooter.getOutputCurrent());
+        SmartDashboard.putBoolean("Above4k", (nowVel > 4000.0));
+        SmartDashboard.putBoolean("isShooterActive", (nowSetpoint != 0));
+        SmartDashboard.putNumber("ShotCount", ShotCount);
+
+        lastVelocity = Shooter.getEncoder().getVelocity();
     }
     
 
@@ -65,6 +80,7 @@ public class ShooterIntake extends SubsystemBase {
     }
         public void stopmotors() {
         Shooter.getClosedLoopController().setSetpoint(0, ControlType.kVelocity);
+        goalspeed = 0;
         Intake.set(0);
       
     }

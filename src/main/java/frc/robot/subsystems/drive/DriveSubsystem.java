@@ -128,7 +128,13 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getState() } ); // :3
 
     
-      SmartDashboard.putNumber("FR Turn Enc", m_frontRight.getPosition().angle.getDegrees());
+      // SmartDashboard.putNumber("FR Turn Enc", m_frontRight.getPosition().angle.getDegrees());
+
+      SmartDashboard.putNumber("FL Encoder", m_frontLeft.getPosition().distanceMeters);
+      SmartDashboard.putNumber("FR Encoder", m_frontRight.getPosition().distanceMeters);
+      SmartDashboard.putNumber("RL Encoder", m_rearLeft.getPosition().distanceMeters);
+      SmartDashboard.putNumber("RR Encoder", m_rearRight.getPosition().distanceMeters);
+
 
     // Diagnostics
     if (Constants.kDebugLevel >=3) {
