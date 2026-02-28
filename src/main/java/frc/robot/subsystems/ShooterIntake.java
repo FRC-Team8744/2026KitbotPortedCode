@@ -28,7 +28,7 @@ public class ShooterIntake extends SubsystemBase {
     private static final double shootSpeed = -0.8; // 1
     private static final double intakeSpeed = -0.8; // 0.8
     private static final double outtakeSpeed = 0.2; // -0.8
-    private static final double maxSpeed = 1.0; // 5000
+    private static final double maxSpeed = 5000.0; // 5000
     private static final double tolerance = 50;
 
     private final SparkMax Shooter;
@@ -56,8 +56,8 @@ public class ShooterIntake extends SubsystemBase {
     public void run(final double speed) {
         final double validSpeed = MathUtil.clamp(speed, -1, 1);
         this.speed = validSpeed;
-        Intake.set(-validSpeed);
-        Shooter.set(validSpeed);
+        Intake.set(validSpeed);
+        Shooter.set(-validSpeed);
         // Shooter.getClosedLoopController().setSetpoint(vel_rpm, ControlType.kVelocity);
         // SmartDashboard.putNumber("Shooter Setpoint", vel_rpm);
 
@@ -86,6 +86,8 @@ public class ShooterIntake extends SubsystemBase {
     }
 
     public boolean atSpeed() {
+       SmartDashboard.putNumber("Speed", Math.abs(Shooter.getEncoder().getVelocity() - (speed * maxSpeed)));
+       SmartDashboard.putNumber("velocity", Shooter.getEncoder().getVelocity());
         return Math.abs(Shooter.getEncoder().getVelocity() - (speed * maxSpeed)) < tolerance;
     }
 
