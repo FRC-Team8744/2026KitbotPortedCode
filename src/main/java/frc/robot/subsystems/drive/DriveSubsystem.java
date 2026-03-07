@@ -5,6 +5,8 @@
 package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 
 import java.io.IOException;
 
@@ -24,12 +26,15 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.DriveModifier;
+import frc.robot.subsystems.vision.PhotonVision;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -48,18 +53,31 @@ public class DriveSubsystem extends SubsystemBase {
   private final SwerveModuleOffboard m_rearLeft;
   private final SwerveModuleOffboard m_frontRight;
   private final SwerveModuleOffboard m_rearRight;
+  
+  public SwerveModulePosition[] getModulePositions() {
+    return new SwerveModulePosition[] {
+      m_frontLeft.getPosition(),
+      m_frontRight.getPosition(),
+      m_rearLeft.getPosition(),
+      m_rearRight.getPosition()
+    };
+  }
+
 
   // The imu sensor
   public final Multi_IMU m_imu = new Multi_IMU();
-  
+  private PhotonVision m_visionPV;
+
   // Odometry class for tracking robot pose
   private SwerveDriveOdometry m_odometry;
 
   // Create Field2d for robot and trajectory visualizations.
   private Field2d m_field;
+  private final SwerveDrivePoseEstimator m_poseEstimator;
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
+  public DriveSubsystem(PhotonVision m_visionPV, DriveModifier...driveModifiers) {
+    this.m_visionPV = m_visionPV;
     offset_FL = SwerveConstants.kFrontLeftMagEncoderOffsetDegrees;
     offset_RL = SwerveConstants.kRearLeftMagEncoderOffsetDegrees;
     offset_FR = SwerveConstants.kFrontRightMagEncoderOffsetDegrees;
@@ -140,11 +158,20 @@ public class DriveSubsystem extends SubsystemBase {
       } catch (Exception e) {
         e.printStackTrace();
       }
+
+    m_poseEstimator =
+      new SwerveDrivePoseEstimator(
+      Constants.SwerveConstants.kDriveKinematics,
+      m_imu.getHeading(),
+      getModulePositions(),
+      getPose(),
+      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+      VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
   }
 
   @Override
   public void periodic() {
-    // Update the odometry in the periodic block
+    // Update the odometry from the swerve module positions
     m_odometry.update(
         m_imu.getHeading(),
         new SwerveModulePosition[] {
@@ -154,10 +181,23 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
         });
     
+    // Adjust the pose estimator if we have a good view of AprilTags
+    PhotonVision.Result[] visionResult = m_visionPV.getVisionResult();
+    for (PhotonVision.Result visionRes : visionResult) {
+      if (visionRes.apriltag.isPresent()) {
+        if (visionRes.singleTag) {
+          if (visionRes.apriltag.map((t) -> t.getPoseAmbiguity()).orElse(1.0) <= .2 && visionRes.robotPose.isPresent()) {
+            m_poseEstimator.addVisionMeasurement(visionRes.robotPose.get(), visionRes.apriltagTime);
+          }
+        } else {
+          visionRes.robotPose.ifPresent((robotPose) -> m_poseEstimator.addVisionMeasurement(robotPose, visionRes.apriltagTime));
+        }
+      }
+    }
+
       // Update robot position on Field2d.
     m_field.setRobotPose(getPose());
 
-    m_DriverSpeedScale = Constants.kDriverSpeedLimit;
 
     pose_publisher.set(getPose());
     swerve_publisher.set(new SwerveModuleState[] {
@@ -166,6 +206,7 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getState(),
             m_rearRight.getState() } ); // :3
 
+    m_DriverSpeedScale = Constants.kDriverSpeedLimit;
     
       SmartDashboard.putNumber("FR Turn Enc", m_frontRight.getPosition().angle.getDegrees());
 
@@ -196,6 +237,10 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
+  }
+
+  public Pose2d getEstimatedPose() {
+    return m_poseEstimator.getEstimatedPosition();
   }
 
   public void zeroIMU() {

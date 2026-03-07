@@ -17,6 +17,8 @@ public final class Constants {
   public static final int kMaxSpeedPercentTeleop = 100;
   public static final int kMaxAccelerationPercent = 100;
   public static final double kDriverSpeedLimit = 0.5; // sets how much the max speed is modified by when you press down on the left stick basicly make go slower the default is 1 btw 
+  public static double autoRotateSpeed = 0;
+  public static RotationEnum isAutoRotate = RotationEnum.NONE;
 
 
 
