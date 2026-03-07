@@ -58,7 +58,7 @@ public class ShooterIntake extends SubsystemBase {
     //TODO: need to have intake on it's own run method
     public void run(final double speed) {
         final double validSpeed = MathUtil.clamp(speed, -1, 1);
-        this.speed = validSpeed;
+        this.goalspeed = validSpeed;
         Intake.set(validSpeed);
         Shooter.set(-validSpeed);
         // Shooter.getClosedLoopController().setSetpoint(vel_rpm, ControlType.kVelocity);
@@ -109,9 +109,9 @@ public class ShooterIntake extends SubsystemBase {
     }
 
     public boolean atSpeed() {
-       SmartDashboard.putNumber("Speed", Math.abs(Shooter.getEncoder().getVelocity() - (speed * maxSpeed)));
+       SmartDashboard.putNumber("Speed", Math.abs(Shooter.getEncoder().getVelocity() - (goalspeed * maxSpeed)));
        SmartDashboard.putNumber("velocity", Shooter.getEncoder().getVelocity());
-        return Math.abs(Shooter.getEncoder().getVelocity() - (speed * maxSpeed)) < tolerance;
+        return Math.abs(Shooter.getEncoder().getVelocity() - (goalspeed * maxSpeed)) < tolerance;
     }
 
     public Command standby() {
