@@ -4,8 +4,13 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ConstantsOffboard;
 import frc.robot.Constants.OIConstants;
@@ -31,6 +36,7 @@ public class RobotContainer {
   private final ShooterIntake m_shooterIntake = new ShooterIntake();
   private final Indexer m_indexer = new Indexer();
 
+  private final SendableChooser<Command> m_autoChooser;
 
   //TODO: Once waitForSpeed is fix, fix these
   private final Command intake = 
@@ -69,6 +75,8 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+    m_autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Mode", m_autoChooser);
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -101,5 +109,9 @@ public class RobotContainer {
     m_driver.back().whileTrue(Commands.runOnce(() -> m_robotDrive.m_imu.zeroHeading()));
     // m_driver.y().whileTrue(stopAll);
    // m_driver.rightTrigger().whileTrue(intakeShoot);
+  }
+
+  public Command getAutonomousCommand() {
+    return m_autoChooser.getSelected();
   }
 }

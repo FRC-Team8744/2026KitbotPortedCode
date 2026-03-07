@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.8806111279485536,
-        "y": 5.565873600441298
+        "x": 2.3581084337349396,
+        "y": 6.974554216867469
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9113560946263224,
-        "y": 5.330902683272273
+        "x": 2.3191177903645146,
+        "y": 6.727613475535545
       },
       "isLocked": false,
-      "linkedName": "MiddleBaseLine1"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.7071301441350655,
-        "y": 6.726042503963363
+        "x": 2.3581084337349396,
+        "y": 5.466530120481927
       },
       "prevControl": {
-        "x": 1.059586519888604,
-        "y": 6.46170022214821
+        "x": 2.2925421686719716,
+        "y": 5.739722891560851
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "StartingPoint1"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 1.5,
+    "maxAcceleration": 1.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -45,10 +45,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "MiddleBaseLine(2)",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

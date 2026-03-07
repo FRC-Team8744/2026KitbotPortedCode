@@ -13,7 +13,7 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
   public static final int kDebugLevel = 0; // 0 = None, 1 = Errors, 2 = Info, 3 = Debug and USB data log
   
-  public static final int kMaxSpeedPercentAuto = 100;
+  public static final int kMaxSpeedPercentAuto = 25;
   public static final int kMaxSpeedPercentTeleop = 100;
   public static final int kMaxAccelerationPercent = 100;
   public static final double kDriverSpeedLimit = 0.5; // sets how much the max speed is modified by when you press down on the left stick basicly make go slower the default is 1 btw 

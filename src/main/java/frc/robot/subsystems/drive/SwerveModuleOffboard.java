@@ -127,20 +127,21 @@ public class SwerveModuleOffboard {
         return 0.0;
     }
   }
-
   /**
-   * Returns the CANcoder's measured turn angle in radians.
+   * Returns the CANcoder's measured turn angle in degrees.
    */
   public double getAbsTurnAngle() {
-    var posVal = m_canCoder.getAbsolutePosition();
+    var posVal = m_canCoder.getAbsolutePosition(); // This actaully waits that long! Don't call after init!
     if(posVal.getStatus().isOK()) {
+        /* Perform seeding */
         double val = posVal.getValue().in(Degrees);
-        return Units.degreesToRadians(val - m_canCoderOffsetDegrees);
+        return (Units.degreesToRadians(val - m_canCoderOffsetDegrees));
     } else {
         /* Report error and retry later */
         System.out.println("Error reading CANcoder position! Robot will not drive straight!");
-        return 0.0;
+        return 0;
     }
+
   }
 
   /**
