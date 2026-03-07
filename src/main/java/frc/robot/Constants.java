@@ -11,6 +11,26 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
+  
+  public static RotationEnum isAutoRotate = RotationEnum.NONE;
+  public static boolean isAutoXSpeed = false;
+  public static double autoXSpeed = 0;
+  public static double autoYSpeed = 0;
+  public static double autoRotateSpeed = 0;
+  public static boolean isAutoYSpeed = false;
+  public static String robotPositionXString = "Alliance";
+  public static String robotPositionYString = "None";
+  public static boolean shuttleMode = false;
+  public static double hoodAngle = 83.25;
+  public static boolean autoIntake = true;
+  public static boolean autoShoot = true;
+  public static int kPDH_ID = 30;
+
+
+
+
+
+
   public static final int kDebugLevel = 0; // 0 = None, 1 = Errors, 2 = Info, 3 = Debug and USB data log
   
   public static final int kMaxSpeedPercentAuto = 25;
