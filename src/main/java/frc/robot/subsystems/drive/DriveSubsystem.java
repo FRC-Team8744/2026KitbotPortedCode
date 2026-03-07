@@ -5,20 +5,26 @@
 package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.subsystems.Photonvision;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -38,17 +44,37 @@ public class DriveSubsystem extends SubsystemBase {
   private final SwerveModuleOffboard m_frontRight;
   private final SwerveModuleOffboard m_rearRight;
 
+
+    private PIDController m_turnCtrl = new PIDController(0.03, 0.0065, 0.0035);
+    
   // The imu sensor
   public final Multi_IMU m_imu = new Multi_IMU();
-  
+  private Photonvision m_visionPV;
   // Odometry class for tracking robot pose
   private SwerveDriveOdometry m_odometry;
 
   // Create Field2d for robot and trajectory visualizations.
   private Field2d m_field;
 
+  private Timer rotationTimer = new Timer();
+  private double originalX = 0;
+  private double originalY = 0;
+  final Timer m_timerX = new Timer();
+final Timer m_timerY = new Timer();
+
+
+   private final SwerveDrivePoseEstimator m_poseEstimator;
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
+  public DriveSubsystem(Photonvision m_visionPV) {
+        m_turnCtrl.setTolerance(10.00);
+    // this.m_vision = m_vision;
+    this.m_visionPV = m_visionPV;
+
+  
+
+
+
+    //m_imu.reset();
     offset_FL = SwerveConstants.kFrontLeftMagEncoderOffsetDegrees;
     offset_RL = SwerveConstants.kRearLeftMagEncoderOffsetDegrees;
     offset_FR = SwerveConstants.kFrontRightMagEncoderOffsetDegrees;
@@ -101,11 +127,51 @@ public class DriveSubsystem extends SubsystemBase {
       // Reference: https://www.chiefdelphi.com/t/has-anyone-gotten-pathplanner-integrated-with-the-maxswerve-template/443646
 
       SmartDashboard.putData(m_field);
-  }
+      
 
+      
+    m_poseEstimator =
+    new SwerveDrivePoseEstimator(
+      Constants.SwerveConstants.kDriveKinematics,
+      m_imu.getHeading(),
+      getModulePositions(),
+      getPose(),
+      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+      VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+    originalX = m_poseEstimator.getEstimatedPosition().getX();
+    originalY = m_poseEstimator.getEstimatedPosition().getY();
+    m_timerX.start();
+    m_timerY.start();
+    rotationTimer.start();
+  }
+  
+public SwerveModulePosition[] getModulePositions(){
+
+return new SwerveModulePosition[]{
+  m_frontLeft.getPosition(),
+  m_frontRight.getPosition(),
+  m_rearLeft.getPosition(),
+  m_rearRight.getPosition()
+};
+
+}
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
+       // Update the odometry in the periodic block
+    Photonvision.Result[] visionResult = m_visionPV.getVisionResult();
+    for (Photonvision.Result visionRes : visionResult) {
+      if (visionRes.apriltag.isPresent()) {
+        if (visionRes.singleTag) {
+          if (visionRes.apriltag.map((t) -> t.getPoseAmbiguity()).orElse(1.0) <= .2 && visionRes.robotPose.isPresent()) {
+            m_poseEstimator.addVisionMeasurement(visionRes.robotPose.get(), visionRes.apriltagTime);
+          }
+        } else {
+          visionRes.robotPose.ifPresent((robotPose) -> m_poseEstimator.addVisionMeasurement(robotPose, visionRes.apriltagTime));
+        }
+      }
+    }
+    
     m_odometry.update(
         m_imu.getHeading(),
         new SwerveModulePosition[] {
@@ -114,7 +180,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
         });
-    
+    m_poseEstimator.update(m_imu.getHeading(), getModulePositions());
       // Update robot position on Field2d.
     m_field.setRobotPose(getPose());
 
@@ -153,7 +219,22 @@ public class DriveSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("FR Turn Enc", m_frontRight.getPosition().angle.getDegrees());
       SmartDashboard.putNumber("RL Turn Enc", m_rearLeft.getPosition().angle.getDegrees());
       SmartDashboard.putNumber("RR Turn Enc", m_rearRight.getPosition().angle.getDegrees());
-    }
+
+
+    }  
+
+  if (m_visionPV.getVisionResult()[0].singleTag && m_visionPV.getVisionResult()[0].apriltag.isPresent()){
+    SmartDashboard.putNumber("Tag number", m_visionPV.getVisionResult()[0].apriltag.get().getFiducialId());
+  }
+ double counter = 0;
+ Photonvision.Result[] visionResult2 = m_visionPV.getVisionResult();
+ for (Photonvision.Result visionRes : visionResult2){
+  if (visionRes.apriltag.isPresent()){ counter++;}
+ }
+
+SmartDashboard.putNumber("tag counter", counter);
+
+  m_field.setRobotPose(m_poseEstimator.getEstimatedPosition());
 }
 
   /**

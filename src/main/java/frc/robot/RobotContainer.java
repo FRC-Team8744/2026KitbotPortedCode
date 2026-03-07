@@ -5,7 +5,11 @@
 package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.ConstantsOffboard;
 import frc.robot.Constants.OIConstants;
@@ -18,6 +22,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.subsystems.Photonvision;
+import edu.wpi.first.math.util.Units;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -27,12 +33,25 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  //private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ShooterIntake m_shooterIntake = new ShooterIntake();
   private final Indexer m_indexer = new Indexer();
 
 
+ private final Rotation3d cameraToRobotOffsetRotationLeft = new Rotation3d(Units.degreesToRadians(12.75), Units.degreesToRadians(22.25), Units.degreesToRadians(-56.2));
+  private final Rotation3d cameraToRobotOffsetRotationRight = new Rotation3d(Units.degreesToRadians(12.75), Units.degreesToRadians(-22.25), Units.degreesToRadians(-56.2));
 
+  private final Transform3d cameraToRobotOffsetLeft = new Transform3d(Units.inchesToMeters(-22.5*0.39370079), Units.inchesToMeters(-27.5*0.39370079), Units.inchesToMeters(21*0.39370079), cameraToRobotOffsetRotationLeft);
+  private final Transform3d cameraToRobotOffsetRight = new Transform3d(Units.inchesToMeters(-22.5*0.39370079), Units.inchesToMeters(27.5*0.39370079), Units.inchesToMeters(21*0.39370079), cameraToRobotOffsetRotationRight);
+
+  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2026RebuiltAndymark.loadAprilTagLayoutField();
+  // private final PhotonVision.Context photonVisionContext = new PhotonVision.Context(aprilTagFieldLayout, new PhotonVision.CameraWithOffsets("Limelight4.1", cameraToRobotOffset1), new PhotonVision.CameraWithOffsets("Limelight4.2", cameraToRobotOffset2));
+  private final Photonvision.Context photonVisionContext = new Photonvision.Context(aprilTagFieldLayout, new Photonvision.CameraWithOffsets("back_left_camera", cameraToRobotOffsetLeft), new Photonvision.CameraWithOffsets("back_right_camera", cameraToRobotOffsetRight));
+  private final Photonvision m_visionPV = new Photonvision(photonVisionContext);
+  // private Limelight4Test m_limelight4Test = new Limelight4Test();0
+  private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_visionPV);
+
+  
 
   //TODO: Once waitForSpeed is fix, fix these
   private final Command intake = 

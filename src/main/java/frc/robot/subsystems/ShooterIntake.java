@@ -76,7 +76,7 @@ public class ShooterIntake extends SubsystemBase {
         final double validSpeed = MathUtil.clamp(rpm, -5600, 5600);
         goalspeed = validSpeed;
         Shooter.getClosedLoopController().setSetpoint(validSpeed, ControlType.kVelocity);
-       // Shooter.set(validSpeed);
+       // Shooter.set(validSpeed);//opponent to our goals
     }
         public void stopmotors() {
         Shooter.getClosedLoopController().setSetpoint(0, ControlType.kVelocity);
