@@ -211,7 +211,7 @@
     "rotation": 48.86915417131252
   },
   "reversed": false,
-  "folder": "gaming folder",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

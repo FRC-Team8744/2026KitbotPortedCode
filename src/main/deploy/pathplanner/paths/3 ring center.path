@@ -68,8 +68,8 @@
         "y": 5.597779868883232
       },
       "prevControl": {
-        "x": 5.948939332991267,
-        "y": 2.766392547434743
+        "x": 5.948939332991268,
+        "y": 2.7663925474347435
       },
       "nextControl": {
         "x": 8.38644912838575,
@@ -166,7 +166,7 @@
     "rotation": 11.964891705217912
   },
   "reversed": false,
-  "folder": "gaming folder",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

@@ -85,7 +85,7 @@
     "rotation": 5.0
   },
   "reversed": false,
-  "folder": "4 piece all left 2 center",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
