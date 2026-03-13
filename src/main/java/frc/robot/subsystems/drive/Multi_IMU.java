@@ -11,6 +11,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Multi_IMU extends SubsystemBase {
   public static final int PIGEON_CAN_ID = 15;
@@ -25,6 +26,7 @@ public class Multi_IMU extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Pigeon2 GyroZ", m_pigeon.getYaw().getValueAsDouble());
     SmartDashboard.putNumber("Pigeon2 GyroZ", m_pigeon.getYaw().getValueAsDouble());
   }
 
@@ -41,7 +43,8 @@ public class Multi_IMU extends SubsystemBase {
    * @return the robot's heading as Rotation2D
    */
   public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(m_pigeon.getYaw().getValueAsDouble());
+    // return Rotation2d.fromDegrees(m_pigeon.getYaw());
+    return m_pigeon.getRotation2d();
   }
 
   /**
