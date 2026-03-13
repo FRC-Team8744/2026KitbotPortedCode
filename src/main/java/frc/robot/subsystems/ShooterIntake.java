@@ -25,11 +25,11 @@ public class ShooterIntake extends SubsystemBase {
     private static final int shooterID = 14;
     private static final int intakeID = 19;
     private static final double idleSpeed = -0;
-    private static final double shootSpeed = -0.8; // 1
-    private static final double intakeSpeed = -0.8; // 0.8
-    private static final double outtakeSpeed = 0.2; // -0.8
+    private static final double shootSpeed = 0.8; // 1
+    private static final double intakeSpeed = 0.8; // 0.8
+    private static final double outtakeSpeed = -0.8; // -0.8
     private static final double maxSpeed = 5000.0; // 5000
-    private static final double tolerance = 50;
+    private static final double tolerance = 350;
 
     private final SparkMax Shooter;
     private final SparkMax Intake;
@@ -40,7 +40,7 @@ public class ShooterIntake extends SubsystemBase {
         super("ShooterIntake");
         Shooter = new SparkMax(shooterID, MotorType.kBrushless);
         Intake = new SparkMax(intakeID, MotorType.kBrushless);
-        // configMotor();
+         configMotor();
         setDefaultCommand(standby());
     }
     
@@ -57,7 +57,7 @@ public class ShooterIntake extends SubsystemBase {
         final double validSpeed = MathUtil.clamp(speed, -1, 1);
         this.speed = validSpeed;
         Intake.set(validSpeed);
-        Shooter.set(-validSpeed);
+        Shooter.set(validSpeed);
         // Shooter.getClosedLoopController().setSetpoint(vel_rpm, ControlType.kVelocity);
         // SmartDashboard.putNumber("Shooter Setpoint", vel_rpm);
 
@@ -67,7 +67,7 @@ public class ShooterIntake extends SubsystemBase {
         SparkMaxConfig shooterConfig = new SparkMaxConfig();
 
         shooterConfig
-            // .smartCurrentLimit()
+            //.smartCurrentLimit()
             // .inverted(false)
             .idleMode(IdleMode.kCoast);
         shooterConfig.closedLoop
@@ -83,7 +83,17 @@ public class ShooterIntake extends SubsystemBase {
         //     .allowedProfileError(1, ClosedLoopSlot.kSlot3);
 
         Shooter.configure(shooterConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+         SparkMaxConfig intakeConfig = new SparkMaxConfig();
+
+        intakeConfig
+            .smartCurrentLimit(20)
+            // .inverted(false)
+            .idleMode(IdleMode.kCoast);
+       
+        Intake.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
+
+
 
     public boolean atSpeed() {
        SmartDashboard.putNumber("Speed", Math.abs(Shooter.getEncoder().getVelocity() - (speed * maxSpeed)));

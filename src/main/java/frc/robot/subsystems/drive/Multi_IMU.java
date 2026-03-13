@@ -27,7 +27,6 @@ public class Multi_IMU extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Pigeon2 GyroZ", m_pigeon.getYaw().getValueAsDouble());
-    SmartDashboard.putNumber("Pigeon2 GyroZ", m_pigeon.getYaw().getValueAsDouble());
   }
 
   /**
