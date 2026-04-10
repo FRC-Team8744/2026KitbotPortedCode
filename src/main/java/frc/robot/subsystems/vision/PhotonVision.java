@@ -34,7 +34,7 @@ public class PhotonVision extends SubsystemBase {
     for (int i = 0; i < context.numberOfCameras; i++) {
       CameraWithOffsets cameraWithOffsets = context.cameras[i];
       PhotonPipelineResult result = cameraWithOffsets.camera.getLatestResult();
-      resultBuilder[i] = new Result(null, null, 0.0, true);
+      resultBuilder[i] = new Result(null, null, 0.0, true, 0.0);
       resultBuilder[i].apriltagTime = result.getTimestampSeconds();
       result.getTargets();
   
@@ -102,16 +102,18 @@ public class PhotonVision extends SubsystemBase {
     public Optional <Pose2d> robotPose;
     public double apriltagTime;
     public boolean singleTag;
+    public double distanceToTarget;
 
-    private Result(PhotonTrackedTarget apriltag, Pose3d robotPose, double apriltagTime, boolean singleTag) {
+    private Result(PhotonTrackedTarget apriltag, Pose3d robotPose, double apriltagTime, boolean singleTag, double distanceToTarget) {
       this.apriltag = Optional.ofNullable(apriltag);
       this.robotPose = Optional.ofNullable(robotPose).map((rp) -> rp.toPose2d());
       this.apriltagTime = apriltagTime;
       this.singleTag = singleTag;
+      this.distanceToTarget = distanceToTarget;
     }
 
     public static Result[] empty() {
-      return new Result[] { new Result(null, null, 0.0, true) };
+      return new Result[] { new Result(null, null, 0.0, true, 0.0) };
     }
   }
 }

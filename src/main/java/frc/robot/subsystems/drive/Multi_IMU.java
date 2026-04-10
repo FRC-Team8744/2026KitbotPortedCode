@@ -46,6 +46,11 @@ public class Multi_IMU extends SubsystemBase {
     return m_pigeon.getRotation2d();
   }
 
+  public Rotation2d getRotation2d() {
+    // return Rotation2d.fromDegrees(m_pigeon.getYaw());
+    return m_pigeon.getRotation2d();
+  }
+
   /**
    * Returns human readable heading of the robot.
    *

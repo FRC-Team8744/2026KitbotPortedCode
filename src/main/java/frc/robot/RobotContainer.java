@@ -6,7 +6,12 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
@@ -18,6 +23,7 @@ import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.ShooterIntake;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.vision.PhotonVision;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -32,7 +38,29 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  // private final Rotation3d cameraToRobotOffsetRotationLeft = new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(19.6), Units.degreesToRadians(-139.8));
+  // private final Rotation3d cameraToRobotOffsetRotationRight = new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(20.2), Units.degreesToRadians(141.7));
+  // private final Rotation3d cameraToRobotOffsetRotationLeft = new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(19.6), Units.degreesToRadians(-147.4));
+  // private final Rotation3d cameraToRobotOffsetRotationRight = new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(20.2), Units.degreesToRadians(146.0));
+  private final Rotation3d cameraToRobotOffsetRotationLeft = new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(19.6), Units.degreesToRadians(-147.4));
+  private final Rotation3d cameraToRobotOffsetRotationRight = new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(20.9), Units.degreesToRadians(146.0));
+
+  // private final Transform3d cameraToRobotOffsetLeft = new Transform3d(Units.inchesToMeters(-10.59), Units.inchesToMeters(5.474), Units.inchesToMeters(14.142), cameraToRobotOffsetRotationLeft);
+  // private final Transform3d cameraToRobotOffsetRight = new Transform3d(Units.inchesToMeters(-10.59), Units.inchesToMeters(-5.474), Units.inchesToMeters(14.142), cameraToRobotOffsetRotationRight);
+  // private final Transform3d cameraToRobotOffsetRight = new Transform3d(Units.inchesToMeters(-8.705), Units.inchesToMeters(-6.942), Units.inchesToMeters(11.202), cameraToRobotOffsetRotationRight);
+  // private final Transform3d cameraToRobotOffsetLeft = new Transform3d(Units.inchesToMeters(-7.25), Units.inchesToMeters(8.75), Units.inchesToMeters(15), cameraToRobotOffsetRotationLeft);
+  // private final Transform3d cameraToRobotOffsetRight = new Transform3d(Units.inchesToMeters(-7.25), Units.inchesToMeters(-8.75), Units.inchesToMeters(15), cameraToRobotOffsetRotationRight);
+  private final Transform3d cameraToRobotOffsetLeft = new Transform3d(Units.inchesToMeters(-8.75), Units.inchesToMeters(0), Units.inchesToMeters(15), cameraToRobotOffsetRotationLeft);
+  private final Transform3d cameraToRobotOffsetRight = new Transform3d(Units.inchesToMeters(-8.75), Units.inchesToMeters(0), Units.inchesToMeters(15), cameraToRobotOffsetRotationRight);
+  // private final Transform3d cameraToRobotOffsetLeft = new Transform3d(0, 0, 0, cameraToRobotOffsetRotationLeft);
+  // private final Transform3d cameraToRobotOffsetRight = new Transform3d(0, 0, 0, cameraToRobotOffsetRotationRight);
+
+  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2026RebuiltAndymark.loadAprilTagLayoutField();
+  // private final PhotonVision.Context photonVisionContext = new PhotonVision.Context(aprilTagFieldLayout, new PhotonVision.CameraWithOffsets("Limelight4.1", cameraToRobotOffset1), new PhotonVision.CameraWithOffsets("Limelight4.2", cameraToRobotOffset2));
+  private final PhotonVision.Context photonVisionContext = new PhotonVision.Context(aprilTagFieldLayout, new PhotonVision.CameraWithOffsets("Limelight4Left", cameraToRobotOffsetLeft), new PhotonVision.CameraWithOffsets("Limelight4Right", cameraToRobotOffsetRight));
+  private final PhotonVision m_visionPV = new PhotonVision(photonVisionContext);
+
+  private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_visionPV);
   private final ShooterIntake m_shooterIntake = new ShooterIntake();
   private final Indexer m_indexer = new Indexer();
 

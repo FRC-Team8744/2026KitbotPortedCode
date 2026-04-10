@@ -5,6 +5,8 @@
 package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 
 import java.io.IOException;
 
@@ -16,11 +18,14 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
@@ -30,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.subsystems.vision.PhotonVision;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -51,15 +57,27 @@ public class DriveSubsystem extends SubsystemBase {
 
   // The imu sensor
   public final Multi_IMU m_imu = new Multi_IMU();
+  private PhotonVision m_visionPV;
   
   // Odometry class for tracking robot pose
   private SwerveDriveOdometry m_odometry;
+  private final SwerveDrivePoseEstimator m_poseEstimator;
+
+  public SwerveModulePosition[] getModulePositions() {
+    return new SwerveModulePosition[] {
+      m_frontLeft.getPosition(),
+      m_frontRight.getPosition(),
+      m_rearLeft.getPosition(),
+      m_rearRight.getPosition()
+    };
+  }
 
   // Create Field2d for robot and trajectory visualizations.
   private Field2d m_field;
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
+  public DriveSubsystem(PhotonVision m_visionPV) {
+    this.m_visionPV = m_visionPV;
     offset_FL = SwerveConstants.kFrontLeftMagEncoderOffsetDegrees;
     offset_RL = SwerveConstants.kRearLeftMagEncoderOffsetDegrees;
     offset_FR = SwerveConstants.kFrontRightMagEncoderOffsetDegrees;
@@ -140,10 +158,37 @@ public class DriveSubsystem extends SubsystemBase {
       } catch (Exception e) {
         e.printStackTrace();
       }
-  }
+
+    m_poseEstimator =
+    new SwerveDrivePoseEstimator(
+      Constants.SwerveConstants.kDriveKinematics,
+      m_imu.getRotation2d(),
+      getModulePositions(),
+      getPose(),
+      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+      VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+    }
 
   @Override
   public void periodic() {
+    // Update the odometry in the periodic block
+    PhotonVision.Result[] visionResult = m_visionPV.getVisionResult();
+    for (PhotonVision.Result visionRes : visionResult) {
+      if (visionRes.apriltag.isPresent()) {
+        if (visionRes.singleTag) {
+          if (visionRes.apriltag.map((t) -> t.getPoseAmbiguity()).orElse(1.0) <= .2 && visionRes.robotPose.isPresent() && visionRes.distanceToTarget < 3.5) {
+            m_poseEstimator.addVisionMeasurement(visionRes.robotPose.get(), visionRes.apriltagTime);
+          }
+        } else {
+          visionRes.robotPose.ifPresent((robotPose) -> m_poseEstimator.addVisionMeasurement(robotPose, visionRes.apriltagTime));
+        }
+      }
+    }
+
+    m_poseEstimator.update(m_imu.getRotation2d(), getModulePositions());
+
+    m_field.setRobotPose(m_poseEstimator.getEstimatedPosition());
+
     // Update the odometry in the periodic block
     m_odometry.update(
         m_imu.getHeading(),
@@ -200,6 +245,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void zeroIMU() {
     m_imu.zeroHeading();
+    m_poseEstimator.resetPosition(m_imu.getRotation2d(), getModulePositions(), getEstimatedPose());
   }
 
   /**
@@ -217,6 +263,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
         },
         pose);
+    m_poseEstimator.resetPosition(m_imu.getRotation2d(), getModulePositions(), pose);
   }
 
   /**
@@ -309,4 +356,19 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
+  public Pose2d getEstimatedPose() {
+    return m_poseEstimator.getEstimatedPosition();
+  }
+
+  public Pose2d getEstimatedPoseAsRadians() {
+    return new Pose2d(m_poseEstimator.getEstimatedPosition().getX(), m_poseEstimator.getEstimatedPosition().getY(), new Rotation2d(m_poseEstimator.getEstimatedPosition().getRotation().getRadians()));
+  }
+
+  public void setEstimatedPose(Pose2d pose) {
+    m_poseEstimator.resetPosition(m_imu.getRotation2d(), getModulePositions(), pose);
+  }
+
+  public void zeroEstimatedPose() {
+    m_poseEstimator.resetPosition(m_imu.getRotation2d(), getModulePositions(), new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
+  }
 }
